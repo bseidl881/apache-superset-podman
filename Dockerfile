@@ -26,7 +26,7 @@
 ARG PY_VER=3.11-slim-trixie@sha256:b7a9e5f6a93d6d4a31f129bbd4bdee69efccb6ded0fb230d78aafaf37af98377
 
 # If BUILDPLATFORM is null, set it to 'amd64' (or leave as is otherwise).
-ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
+# ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
 
 # Include translations in the final build
 ARG BUILD_TRANSLATIONS="false"
@@ -307,9 +307,7 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
 
 # Copy compiled frontend assets and application source now that
 # dependencies have been resolved and cached above.
-COPY --from=superset-node /app/superset/static/assets superset/static/assets
-# Copy service.worker.js optionally as it doesn't exist when DEV_MODE=true
-COPY --from=superset-node /app/superset/static/service-worker.j[s] superset/static/service-worker.js
+COPY --from=superset-node /app/superset/static/ superset/static/
 
 # TODO, when the next version comes out, use --exclude superset/translations
 COPY superset superset
@@ -398,9 +396,7 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
 
 # Copy compiled frontend assets and application source now that
 # dependencies have been resolved and cached above.
-COPY --from=superset-node /app/superset/static/assets superset/static/assets
-# Copy service.worker.js optionally as it doesn't exist when DEV_MODE=true
-COPY --from=superset-node /app/superset/static/service-worker.j[s] superset/static/service-worker.js
+COPY --from=superset-node /app/superset/static/ superset/static/
 
 # TODO, when the next version comes out, use --exclude superset/translations
 COPY superset superset

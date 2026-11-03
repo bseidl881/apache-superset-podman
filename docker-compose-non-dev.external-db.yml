@@ -1,0 +1,37 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# -----------------------------------------------------------------------
+# Overlay for using an external PostgreSQL instance instead of the bundled
+# local `db` service. Combine this with docker-compose-non-dev.yml and set
+# DATABASE_* in docker/.env-local (or deployment environment variables).
+#
+# Example:
+#   podman compose -f docker-compose-non-dev.yml \
+#     -f docker-compose-non-dev.external-db.yml up --build
+# -----------------------------------------------------------------------
+
+services:
+  db:
+    profiles:
+      - local-db
+
+  superset-init:
+    depends_on:
+      redis:
+        condition: service_started
+

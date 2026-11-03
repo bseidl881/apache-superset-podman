@@ -28,6 +28,7 @@ x-superset-volumes:
   &superset-volumes # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
   - ./docker:/app/docker
   - superset_home:/app/superset_home
+  - ${SQLITE_FILES_DIR:-./local_sqlite}:/app/sqlite
 
 x-common-build: &common-build
   context: .
@@ -174,6 +175,33 @@ services:
     # Overrides the image-level HEALTHCHECK, which probes the Superset app.
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health"]
+
+  # MCP server, launched from the same batteries-included image. Opt-in — start
+  # it with `docker compose -f docker-compose-non-dev.yml --profile mcp up`.
+  superset-mcp:
+    build:
+      <<: *common-build
+    container_name: superset_mcp
+    profiles:
+      - mcp
+    command: ["/app/docker/docker-bootstrap.sh", "mcp"]
+    env_file:
+      - path: docker/.env # default
+        required: true
+      - path: docker/.env-local # optional override
+        required: false
+    environment:
+      MCP_PORT: ${MCP_PORT:-5008}
+    restart: unless-stopped
+    depends_on:
+      superset-init:
+        condition: service_completed_successfully
+    user: "root"
+    volumes: *superset-volumes
+    ports:
+      - ${MCP_PORT:-5008}:5008
+    healthcheck:
+      disable: true
 
 volumes:
   superset_home:
